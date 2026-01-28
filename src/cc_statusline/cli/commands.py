@@ -8,6 +8,8 @@ import json
 import sys
 from typing import Optional
 
+from cc_statusline import __version__
+
 
 def create_parser() -> argparse.ArgumentParser:
     """创建参数解析器。
@@ -35,7 +37,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version",
         action="version",
-        version="%(prog)s 0.2.0",
+        version=f"%(prog)s {__version__}",
     )
 
     # 创建子命令

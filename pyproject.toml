@@ -1,6 +1,6 @@
 [project]
 name = "cc-statusline"
-version = "0.2.0"
+version = "0.0.1"
 description = "Claude Code 状态栏功能模块"
 authors = [
     {name = "Michael Che", email = "michaelche@example.com"}
@@ -40,7 +40,7 @@ dev = [
 ]
 
 [project.scripts]
-cc-statusline = "cc_statusline.__main__:main"
+cc-statusline = "cc_statusline.cli.commands:main"
 
 [project.urls]
 Homepage = "https://github.com/michaelche/cc-statusline"

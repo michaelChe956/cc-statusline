@@ -1,6 +1,6 @@
 """cc-statusline: Claude Code 状态栏功能模块"""
 
-__version__ = "0.2.0"
+__version__ = "0.0.1"
 __author__ = "Michael Che"
 __license__ = "Apache-2.0"
 
