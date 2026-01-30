@@ -12,6 +12,7 @@ from cc_statusline.modules.base import (
     ModuleOutput,
     ModuleStatus,
 )
+from cc_statusline.modules.registry import ModuleRegistry, registry
 
 __all__ = [
     "ModuleStatus",
@@ -21,4 +22,6 @@ __all__ = [
     "ModuleError",
     "ModuleNotFoundError",
     "ModuleLoadError",
+    "ModuleRegistry",
+    "registry",
 ]

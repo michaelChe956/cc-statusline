@@ -305,6 +305,118 @@ class TerminalRenderer:
         """
         self._update_callbacks.append(callback)
 
+    def register_update_callback(self, callback: Callable[[str], None]) -> None:
+        """注册更新回调（别名）。
+
+        Args:
+            callback: 回调函数
+        """
+        self.on_update(callback)
+
+    def unregister_update_callback(self, callback: Callable[[str], None]) -> None:
+        """注销更新回调。
+
+        Args:
+            callback: 回调函数
+        """
+        if callback in self._update_callbacks:
+            self._update_callbacks.remove(callback)
+
+    def _update_output_text(self, text: str) -> None:
+        """更新输出文本。
+
+        Args:
+            text: 新的输出文本
+        """
+        with self._lock:
+            self._output_text = text
+
+    def get_output_text(self) -> str:
+        """获取当前输出文本。
+
+        Returns:
+            输出文本
+        """
+        with self._lock:
+            return self._output_text
+
+    def is_running(self) -> bool:
+        """检查渲染器是否正在运行。
+
+        Returns:
+            是否正在运行
+        """
+        return self._running
+
+    def _notify_callbacks(self, text: str) -> None:
+        """通知所有回调。
+
+        Args:
+            text: 要通知的文本
+        """
+        for callback in self._update_callbacks:
+            try:
+                callback(text)
+            except Exception:
+                pass
+
+    def _format_output(self, outputs: list) -> str:
+        """格式化输出。
+
+        Args:
+            outputs: 输出列表
+
+        Returns:
+            格式化后的字符串
+        """
+        if not outputs:
+            return ""
+
+        parts = []
+        for output in outputs:
+            if isinstance(output, ModuleOutput):
+                text = str(output)
+                if text:
+                    parts.append(text)
+
+        separator = " │ "
+        return separator.join(parts)
+
+    def _create_statusline_control(self):
+        """创建状态栏控件。
+
+        Returns:
+            状态栏控件
+        """
+        from prompt_toolkit.layout.controls import FormattedTextControl
+
+        return FormattedTextControl(
+            self._create_toolbar_content,
+            focusable=False,
+        )
+
+    def _create_layout(self):
+        """创建布局。
+
+        Returns:
+            布局对象
+        """
+        from prompt_toolkit.layout.containers import HSplit, Window
+        from prompt_toolkit.layout.layout import Layout
+
+        control = self._create_statusline_control()
+        window = Window(
+            control,
+            height=1,
+            style="class:statusline.default",
+            char=" ",
+        )
+        return Layout(HSplit([window]))
+
+    def refresh_output(self) -> None:
+        """刷新输出。"""
+        self._on_output_update()
+
     def get_output(self) -> str:
         """获取当前输出。
 

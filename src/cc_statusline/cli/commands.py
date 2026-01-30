@@ -191,6 +191,36 @@ def create_parser() -> argparse.ArgumentParser:
         help="以守护进程模式运行（后台更新）",
     )
 
+    parser.add_argument(
+        "--preset",
+        dest="preset",
+        default="standard",
+        choices=["minimal", "standard", "full"],
+        help="使用预设布局 (默认: standard)",
+    )
+
+    parser.add_argument(
+        "--style",
+        dest="style",
+        default="arrow",
+        choices=["arrow", "round", "slant", "curve", "minimal"],
+        help="Powerline 分隔符样式 (默认: arrow)",
+    )
+
+    parser.add_argument(
+        "--watch",
+        action="store_true",
+        help="实时监控模式（独立终端）",
+    )
+
+    parser.add_argument(
+        "--interval",
+        dest="interval",
+        type=float,
+        default=1.0,
+        help="刷新间隔（秒）(默认: 1.0)",
+    )
+
     return parser
 
 
@@ -402,8 +432,13 @@ def cmd_import(args: argparse.Namespace) -> int:
 def cmd_list_modules() -> None:
     """列出所有模块。"""
     # 导入模块以注册它们
+    import cc_statusline.modules.basic  # noqa: F401
+    import cc_statusline.modules.cost  # noqa: F401
     import cc_statusline.modules.mcp_status  # noqa: F401
+    import cc_statusline.modules.model  # noqa: F401
+    import cc_statusline.modules.realtime  # noqa: F401
     import cc_statusline.modules.session_time  # noqa: F401
+    import cc_statusline.modules.time_modules  # noqa: F401
     from cc_statusline.modules.registry import ModuleRegistry
 
     registered = ModuleRegistry.list_modules()
@@ -412,7 +447,7 @@ def cmd_list_modules() -> None:
     print("可用模块:")
     print("-" * 60)
 
-    for name in sorted(registered):
+    for name in sorted([str(n) for n in registered]):
         try:
             metadata = ModuleRegistry.get_metadata(name)
             status = "✓ 已启用" if name in enabled else "✗ 已禁用"
@@ -428,16 +463,31 @@ def cmd_list_modules() -> None:
 def cmd_status(args: argparse.Namespace) -> None:
     """执行 status 命令。"""
     # 导入模块以注册它们
+    import cc_statusline.modules.basic  # noqa: F401
+    import cc_statusline.modules.cost  # noqa: F401
     import cc_statusline.modules.mcp_status  # noqa: F401
+    import cc_statusline.modules.model  # noqa: F401
+    import cc_statusline.modules.realtime  # noqa: F401
     import cc_statusline.modules.session_time  # noqa: F401
+    import cc_statusline.modules.time_modules  # noqa: F401
     from cc_statusline.engine.statusline_engine import EngineConfig, StatuslineEngine
+    from cc_statusline.render.powerline import PowerlineLayout, PowerlineRenderer
     from cc_statusline.render.terminal_renderer import TerminalRenderer
     from cc_statusline.theme import theme_loader
 
+    # 根据预设确定默认模块
+    preset_modules = {
+        "minimal": ["dir", "git_branch", "model", "cost_session", "context_pct"],
+        "standard": ["dir", "git_branch", "model", "version", "context_bar", "session_time", "cost_session", "cost_today"],
+        "full": ["dir", "git_branch", "model", "plan", "version", "context_bar", "session_time", "reset_timer", "cost_session", "cost_today", "burn_rate", "mcp_status", "agent_status"],
+    }
+
     # 创建引擎配置
+    modules = args.modules or preset_modules.get(args.preset, preset_modules["standard"])
     config = EngineConfig(
         theme=args.theme,
-        modules=args.modules or ["mcp_status", "session_time"],
+        modules=modules,
+        refresh_interval=args.interval,
     )
 
     # 创建引擎
@@ -475,6 +525,8 @@ def cmd_status(args: argparse.Namespace) -> None:
                         "status": status,
                         "theme": theme_info,
                         "modules": module_info,
+                        "preset": args.preset,
+                        "style": args.style,
                     },
                     indent=2,
                     ensure_ascii=False,
@@ -487,6 +539,8 @@ def cmd_status(args: argparse.Namespace) -> None:
             print(f"  显示模式: {status['display_mode']}")
             print(f"  刷新间隔: {status['refresh_interval']}s")
             print(f"  模块数量: {status['modules']['total']} / {status['modules']['enabled']}")
+            print(f"  预设: {args.preset}")
+            print(f"  样式: {args.style}")
             print()
             print("主题信息:")
             print(f"  名称: {theme_info['name']}")
@@ -504,13 +558,20 @@ def cmd_status(args: argparse.Namespace) -> None:
         engine.initialize()
         engine.start()
 
-        output = engine.get_combined_output()
+        # 使用 Powerline 渲染器
+        renderer = PowerlineRenderer(args.theme, args.style)
+        outputs = engine.get_outputs()
+
+        # 根据预设渲染
+        output = PowerlineLayout.render_preset(args.preset, outputs, renderer)
+
         if args.json:
-            outputs = engine.get_outputs()
             print(
                 json.dumps(
                     {
                         "theme": args.theme,
+                        "preset": args.preset,
+                        "style": args.style,
                         "output": output,
                         "modules": {name: out.to_dict() for name, out in outputs.items()},
                     },
