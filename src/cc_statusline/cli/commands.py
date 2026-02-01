@@ -221,6 +221,12 @@ def create_parser() -> argparse.ArgumentParser:
         help="刷新间隔（秒）(默认: 1.0)",
     )
 
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="显示调试信息，包括模块可用性状态",
+    )
+
     return parser
 
 
@@ -478,8 +484,8 @@ def cmd_status(args: argparse.Namespace) -> None:
     # 根据预设确定默认模块
     preset_modules = {
         "minimal": ["dir", "git_branch", "model", "cost_session", "context_pct"],
-        "standard": ["dir", "git_branch", "model", "version", "context_bar", "session_time", "cost_session", "cost_today"],
-        "full": ["dir", "git_branch", "model", "plan", "version", "context_bar", "session_time", "reset_timer", "cost_session", "cost_today", "burn_rate", "mcp_status", "agent_status"],
+        "standard": ["dir", "git_branch", "model", "version", "context_bar", "session_time", "reset_timer", "cost_session", "cost_today", "burn_rate"],
+        "full": ["dir", "git_branch", "model", "version", "context_bar", "session_time", "reset_timer", "cost_session", "cost_today", "burn_rate", "mcp_status", "agent_status", "todo_progress"],
     }
 
     # 创建引擎配置
@@ -549,6 +555,60 @@ def cmd_status(args: argparse.Namespace) -> None:
             print("模块列表:")
             for m in module_info:
                 print(f"  - {m['name']}: {m['description']}")
+
+        engine.stop()
+        return
+
+    if args.debug:
+        # 调试模式：显示模块可用性状态
+        engine.initialize()
+        engine.start()
+
+        print("🔍 cc-statusline 调试信息")
+        print("━" * 50)
+        print(f"预设: {args.preset}")
+        print(f"主题: {args.theme}")
+        print(f"请求模块: {', '.join(modules)}")
+        print()
+
+        # 显示上下文数据
+        print("上下文数据:")
+        if context:
+            for key, value in context.items():
+                if isinstance(value, dict):
+                    print(f"  {key}:")
+                    for k, v in value.items():
+                        print(f"    {k}: {v}")
+                else:
+                    print(f"  {key}: {value}")
+        else:
+            print("  (无上下文数据)")
+        print()
+
+        # 显示模块状态
+        print("模块状态:")
+        module_info = engine.get_module_info()
+        for name in modules:
+            info = next((m for m in module_info if m['name'] == name), None)
+            if info:
+                status = "✅ 可用" if info['available'] else "❌ 不可用"
+                print(f"  {name:20} {status}")
+            else:
+                print(f"  {name:20} ⚠️ 未加载")
+        print()
+
+        # 显示实际输出
+        print("实际输出模块:")
+        outputs = engine.get_outputs()
+        for name in outputs:
+            print(f"  - {name}")
+        print()
+
+        # 显示渲染输出
+        print("渲染输出:")
+        renderer = PowerlineRenderer(args.theme, args.style)
+        output = PowerlineLayout.render_preset(args.preset, outputs, renderer)
+        print(output)
 
         engine.stop()
         return
