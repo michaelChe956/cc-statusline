@@ -6,18 +6,18 @@
 import json
 import os
 import subprocess
-from concurrent.futures import ThreadPoolExecutor, Future
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     BaseModule,
     ModuleMetadata,
     ModuleOutput,
     ModuleStatus,
 )
-from cc_statusline.modules.registry import ModuleRegistry
+from cc_status.modules.registry import ModuleRegistry
 
 
 @dataclass
@@ -207,7 +207,10 @@ class MCPStatusModule(BaseModule):
         """
         # 检查配置缓存是否有效
         now = _get_current_time()
-        if self._config_cache is not None and (now - self._config_cache_time) <= self._config_cache_ttl:
+        if (
+            self._config_cache is not None
+            and (now - self._config_cache_time) <= self._config_cache_ttl
+        ):
             return self._config_cache
 
         servers: list[MCPServerInfo] = []

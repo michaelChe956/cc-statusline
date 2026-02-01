@@ -8,10 +8,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable, Optional
 
-from cc_statusline.engine.scheduler import Scheduler
-from cc_statusline.modules.base import BaseModule, ModuleOutput
-from cc_statusline.modules.registry import ModuleRegistry
-from cc_statusline.theme.loader import ThemeLoader
+from cc_status.engine.scheduler import Scheduler
+from cc_status.modules.base import BaseModule, ModuleOutput
+from cc_status.modules.registry import ModuleRegistry
+from cc_status.theme.loader import ThemeLoader
 
 
 class DisplayMode(Enum):

@@ -5,7 +5,7 @@
 
 from typing import Callable, Optional
 
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     BaseModule,
     ModuleLoadError,
     ModuleMetadata,

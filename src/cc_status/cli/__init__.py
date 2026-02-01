@@ -3,7 +3,7 @@
 导出命令行接口相关类型。
 """
 
-from cc_statusline.cli.commands import create_parser, main
+from cc_status.cli.commands import create_parser, main
 
 __all__ = [
     "main",

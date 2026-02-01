@@ -1,6 +1,6 @@
 [project]
 name = "cc-status"
-version = "0.0.3"
+version = "0.0.1"
 description = "Claude Code 状态栏功能模块"
 authors = [
     {name = "Michael Che", email = "michaelche@example.com"}
@@ -40,21 +40,21 @@ dev = [
 ]
 
 [project.scripts]
-cc-statusline = "cc_statusline.cli.commands:main"
+cc-status = "cc_status.cli.commands:main"
 
 [project.urls]
-Homepage = "https://github.com/michaelche/cc-statusline"
-Documentation = "https://github.com/michaelche/cc-statusline#readme"
-Repository = "https://github.com/michaelche/cc-statusline.git"
-Issues = "https://github.com/michaelche/cc-statusline/issues"
-Changelog = "https://github.com/michaelche/cc-statusline/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/michaelche/cc-status"
+Documentation = "https://github.com/michaelche/cc-status#readme"
+Repository = "https://github.com/michaelche/cc-status.git"
+Issues = "https://github.com/michaelche/cc-status/issues"
+Changelog = "https://github.com/michaelche/cc-status/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/cc_statusline"]
+packages = ["src/cc_status"]
 
 [tool.black]
 line-length = 100
@@ -108,7 +108,7 @@ addopts = [
     "-q",
     "--strict-markers",
     "--strict-config",
-    "--cov=cc_statusline",
+    "--cov=cc_status",
     "--cov-report=term-missing",
     "--cov-report=html",
 ]

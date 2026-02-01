@@ -9,8 +9,8 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.validation import Validator
 
-from cc_statusline.config.installer import ClaudeConfigInstaller
-from cc_statusline.theme import get_theme_names
+from cc_status.config.installer import ClaudeConfigInstaller
+from cc_status.theme import get_theme_names
 
 
 class InteractiveInstaller:
@@ -149,7 +149,7 @@ class InteractiveInstaller:
         print("-" * 60)
 
         try:
-            from cc_statusline.engine.statusline_engine import EngineConfig, StatuslineEngine
+            from cc_status.engine.statusline_engine import EngineConfig, StatuslineEngine
 
             # 创建引擎预览
             config = EngineConfig(

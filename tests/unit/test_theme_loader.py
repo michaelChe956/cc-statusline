@@ -1,9 +1,6 @@
 """主题加载器单元测试"""
 
 import pytest
-import yaml
-
-from cc_statusline.theme.loader import ThemeLoader
 
 
 class TestThemeLoaderInit:

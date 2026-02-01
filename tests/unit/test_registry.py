@@ -2,12 +2,12 @@
 
 import pytest
 
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     ModuleLoadError,
     ModuleMetadata,
     ModuleNotFoundError,
 )
-from cc_statusline.modules.registry import ModuleRegistry
+from cc_status.modules.registry import ModuleRegistry
 
 
 class TestModuleRegistrySingleton:
@@ -194,9 +194,7 @@ class TestModuleRegistryThreadSafety:
         def worker():
             try:
                 counter[0] += 1
-                ModuleRegistry.register(
-                    f"test_{uuid.uuid4()}_{counter[0]}", sample_module_class
-                )
+                ModuleRegistry.register(f"test_{uuid.uuid4()}_{counter[0]}", sample_module_class)
             except Exception as e:
                 errors.append(e)
 

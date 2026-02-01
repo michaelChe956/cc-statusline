@@ -2,9 +2,7 @@
 
 from datetime import timedelta
 
-import pytest
-
-from cc_statusline.modules.base import ModuleMetadata, ModuleOutput, ModuleStatus
+from cc_status.modules.base import ModuleStatus
 
 
 class TestSessionTimeModuleLogic:
@@ -12,7 +10,8 @@ class TestSessionTimeModuleLogic:
 
     def test_metadata_values(self) -> None:
         """测试模块元数据值"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
         metadata = module.metadata
 
@@ -24,7 +23,8 @@ class TestSessionTimeModuleLogic:
 
     def test_calculate_elapsed_with_context(self) -> None:
         """测试从上下文计算经过时间"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         # 设置上下文（12.5 小时 = 45000000 毫秒）
@@ -39,7 +39,8 @@ class TestSessionTimeModuleLogic:
 
     def test_calculate_elapsed_no_context(self) -> None:
         """测试无上下文时返回 None"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         elapsed = module._calculate_elapsed()
@@ -48,7 +49,8 @@ class TestSessionTimeModuleLogic:
 
     def test_format_elapsed_hours(self) -> None:
         """测试短格式时间（小时）"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
         elapsed = timedelta(hours=2, minutes=30)
 
@@ -56,7 +58,8 @@ class TestSessionTimeModuleLogic:
 
     def test_format_elapsed_minutes(self) -> None:
         """测试短格式时间（分钟）"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
         elapsed = timedelta(minutes=15, seconds=30)
 
@@ -64,7 +67,8 @@ class TestSessionTimeModuleLogic:
 
     def test_format_elapsed_seconds(self) -> None:
         """测试短格式时间（秒）"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
         elapsed = timedelta(seconds=45)
 
@@ -72,7 +76,8 @@ class TestSessionTimeModuleLogic:
 
     def test_reset(self) -> None:
         """测试重置计时"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         module._last_elapsed = timedelta(hours=5)
@@ -85,7 +90,8 @@ class TestSessionTimeModuleLogic:
 
     def test_get_output_no_elapsed(self) -> None:
         """测试获取输出（无时间数据）"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         output = module.get_output()
@@ -97,7 +103,8 @@ class TestSessionTimeModuleLogic:
 
     def test_get_output_short_session(self) -> None:
         """测试获取输出（短会话 < 1h）"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         context = {"cost": {"total_duration_ms": 1800000}}
@@ -110,7 +117,8 @@ class TestSessionTimeModuleLogic:
 
     def test_get_output_medium_session(self) -> None:
         """测试获取输出（中等会话 1-2h）"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         context = {"cost": {"total_duration_ms": 5400000}}
@@ -123,7 +131,8 @@ class TestSessionTimeModuleLogic:
 
     def test_get_output_long_session(self) -> None:
         """测试获取输出（长会话 >= 2h）"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         context = {"cost": {"total_duration_ms": 10800000}}
@@ -136,19 +145,22 @@ class TestSessionTimeModuleLogic:
 
     def test_is_available(self) -> None:
         """测试模块可用性检查"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
         assert module.is_available() is True
 
     def test_get_refresh_interval(self) -> None:
         """测试获取刷新间隔"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
         assert module.get_refresh_interval() == 1.0
 
     def test_refresh(self) -> None:
         """测试刷新功能"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
         module.set_context({"cost": {"total_duration_ms": 3600000}})
         module.refresh()
@@ -158,7 +170,8 @@ class TestSessionTimeModuleLogic:
 
     def test_set_context(self) -> None:
         """测试设置上下文数据"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         context = {
@@ -177,7 +190,8 @@ class TestSessionTimeModuleLogic:
 
     def test_set_context_empty(self) -> None:
         """测试设置空上下文"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         module.set_context({})
@@ -187,7 +201,8 @@ class TestSessionTimeModuleLogic:
 
     def test_get_output_tooltip(self) -> None:
         """测试 tooltip 显示"""
-        from cc_statusline.modules.session_time import SessionTimeModule
+        from cc_status.modules.session_time import SessionTimeModule
+
         module = SessionTimeModule()
 
         context = {"cost": {"total_duration_ms": 7200000}}

@@ -3,7 +3,7 @@
 导出所有模块相关类型。
 """
 
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     BaseModule,
     ModuleError,
     ModuleLoadError,
@@ -12,7 +12,7 @@ from cc_statusline.modules.base import (
     ModuleOutput,
     ModuleStatus,
 )
-from cc_statusline.modules.registry import ModuleRegistry, registry
+from cc_status.modules.registry import ModuleRegistry, registry
 
 __all__ = [
     "ModuleStatus",

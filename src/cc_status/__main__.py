@@ -2,7 +2,7 @@
 
 import sys
 
-from cc_statusline.cli import main
+from cc_status.cli import main
 
 if __name__ == "__main__":
     sys.exit(main())

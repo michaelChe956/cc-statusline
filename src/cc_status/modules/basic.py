@@ -3,18 +3,17 @@
 提供目录、Git 分支、版本等基础信息。
 """
 
-import os
 import subprocess
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     BaseModule,
     ModuleMetadata,
     ModuleOutput,
     ModuleStatus,
 )
-from cc_statusline.modules.registry import ModuleRegistry
+from cc_status.modules.registry import ModuleRegistry
 
 
 class DirectoryModule(BaseModule):
@@ -69,7 +68,7 @@ class DirectoryModule(BaseModule):
         parts = path_str.split("/")
         if len(parts) > self._max_depth + 1:
             # 显示最后 max_depth 级
-            path_str = ".../" + "/".join(parts[-self._max_depth:])
+            path_str = ".../" + "/".join(parts[-self._max_depth :])
 
         return path_str
 

@@ -1,8 +1,6 @@
 """模块基类单元测试"""
 
-import pytest
-
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     ModuleError,
     ModuleLoadError,
     ModuleMetadata,

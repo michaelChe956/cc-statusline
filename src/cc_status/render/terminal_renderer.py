@@ -15,9 +15,9 @@ from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.styles import Style
 
-from cc_statusline.engine.statusline_engine import EngineConfig, StatuslineEngine
-from cc_statusline.modules.base import ModuleOutput
-from cc_statusline.theme.loader import ThemeLoader
+from cc_status.engine.statusline_engine import EngineConfig, StatuslineEngine
+from cc_status.modules.base import ModuleOutput
+from cc_status.theme.loader import ThemeLoader
 
 
 def _is_tty() -> bool:
@@ -455,7 +455,7 @@ def create_statusline(
     Returns:
         终端渲染器实例
     """
-    from cc_statusline.engine.statusline_engine import DisplayMode
+    from cc_status.engine.statusline_engine import DisplayMode
 
     config = EngineConfig(
         theme=theme,

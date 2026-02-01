@@ -6,8 +6,8 @@
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from cc_statusline.modules.base import ModuleOutput, ModuleStatus
-from cc_statusline.theme.loader import ThemeLoader
+from cc_status.modules.base import ModuleOutput, ModuleStatus
+from cc_status.theme.loader import ThemeLoader
 
 
 @dataclass
