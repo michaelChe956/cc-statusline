@@ -52,7 +52,20 @@ class ModelModule(BaseModule):
         Returns:
             模型名称
         """
-        model = context.get("model", "")
+        model_data = context.get("model", "")
+        if not model_data:
+            return ""
+
+        # 处理对象格式: {"id": "...", "display_name": "Opus"}
+        if isinstance(model_data, dict):
+            # 优先使用 display_name
+            model = model_data.get("display_name", "")
+            if not model:
+                model = model_data.get("id", "")
+        else:
+            # 处理字符串格式（向后兼容）
+            model = str(model_data)
+
         if not model:
             return ""
 
@@ -108,82 +121,6 @@ class ModelModule(BaseModule):
         pass
 
 
-class PlanModule(BaseModule):
-    """订阅计划模块。
-
-    显示 Claude Code 订阅计划 (Pro/Free)。
-    """
-
-    def __init__(self) -> None:
-        self._plan: str = ""
-        self._context: dict[str, Any] = {}
-
-    @property
-    def metadata(self) -> ModuleMetadata:
-        return ModuleMetadata(
-            name="plan",
-            description="显示订阅计划",
-            version="1.0.0",
-            author="Claude Code",
-            enabled=True,
-        )
-
-    def initialize(self) -> None:
-        """初始化模块。"""
-        pass
-
-    def set_context(self, context: dict[str, Any]) -> None:
-        """设置上下文数据。"""
-        self._context = context
-        self._plan = context.get("plan", "")
-
-    def refresh(self) -> None:
-        """刷新计划信息。"""
-        pass
-
-    def get_output(self) -> ModuleOutput:
-        """获取模块输出。"""
-        if not self._plan:
-            return ModuleOutput(
-                text="",
-                icon="",
-                color="",
-                status=ModuleStatus.DISABLED,
-            )
-
-        # 根据计划类型选择颜色
-        plan_lower = self._plan.lower()
-        if "pro" in plan_lower:
-            color = "gold"
-            icon = "⭐"
-        elif "free" in plan_lower:
-            color = "blue"
-            icon = "🆓"
-        else:
-            color = "dim"
-            icon = "📋"
-
-        return ModuleOutput(
-            text=self._plan,
-            icon=icon,
-            color=color,
-            status=ModuleStatus.SUCCESS,
-            tooltip=f"订阅计划: {self._plan}",
-        )
-
-    def is_available(self) -> bool:
-        """检查模块是否可用。"""
-        return bool(self._plan)
-
-    def get_refresh_interval(self) -> float:
-        """获取刷新间隔。"""
-        return 300.0  # 5分钟刷新一次
-
-    def cleanup(self) -> None:
-        """清理资源。"""
-        pass
-
-
 class ContextPercentModule(BaseModule):
     """上下文使用率百分比模块。
 
@@ -224,6 +161,13 @@ class ContextPercentModule(BaseModule):
         Returns:
             使用百分比 (0-100)
         """
+        # 优先从 context_window 对象获取（Claude Code 传递的格式）
+        context_window = context.get("context_window", {})
+        if isinstance(context_window, dict):
+            used_pct = context_window.get("used_percentage")
+            if used_pct is not None:
+                return int(float(used_pct))
+
         # 尝试从 cost 数据中获取
         cost_data = context.get("cost", {})
         if "context_percentage" in cost_data:
@@ -318,6 +262,14 @@ class ContextBarModule(BaseModule):
 
     def _calculate_percentage(self, context: dict[str, Any]) -> int:
         """计算上下文使用百分比。"""
+        # 优先从 context_window 对象获取（Claude Code 传递的格式）
+        context_window = context.get("context_window", {})
+        if isinstance(context_window, dict):
+            used_pct = context_window.get("used_percentage")
+            if used_pct is not None:
+                return int(float(used_pct))
+
+        # 尝试从 cost 数据中获取
         cost_data = context.get("cost", {})
         if "context_percentage" in cost_data:
             return int(cost_data["context_percentage"])
@@ -399,7 +351,6 @@ def _register_modules() -> None:
     """注册所有模型相关模块。"""
     modules = [
         ("model", ModelModule),
-        ("plan", PlanModule),
         ("context_pct", ContextPercentModule),
         ("context_bar", ContextBarModule),
     ]

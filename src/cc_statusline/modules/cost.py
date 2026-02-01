@@ -56,8 +56,9 @@ class CostSessionModule(BaseModule):
             成本金额
         """
         cost_data = context.get("cost", {})
-        # 尝试不同的成本字段
-        for key in ["total_cost", "session_cost", "cost", "amount"]:
+        # 尝试不同的成本字段（按优先级）
+        # Claude Code 传递的是 total_cost_usd
+        for key in ["total_cost_usd", "total_cost", "session_cost", "cost", "amount"]:
             if key in cost_data:
                 value = cost_data[key]
                 if isinstance(value, (int, float)):
@@ -151,7 +152,9 @@ class CostTodayModule(BaseModule):
     def _extract_cost(self, context: dict[str, Any]) -> float:
         """从上下文中提取成本。"""
         cost_data = context.get("cost", {})
-        for key in ["total_cost", "session_cost", "cost"]:
+        # 尝试不同的成本字段（按优先级）
+        # Claude Code 传递的是 total_cost_usd
+        for key in ["total_cost_usd", "total_cost", "session_cost", "cost"]:
             if key in cost_data:
                 value = cost_data[key]
                 if isinstance(value, (int, float)):
@@ -200,80 +203,6 @@ class CostTodayModule(BaseModule):
         pass
 
 
-class CostWeekModule(BaseModule):
-    """本周成本模块。
-
-    显示本周累计成本。
-    """
-
-    def __init__(self) -> None:
-        self._week_cost: float = 0.0
-        self._currency: str = "$"
-        self._context: dict[str, Any] = {}
-        self._decimal_places: int = 2
-
-    @property
-    def metadata(self) -> ModuleMetadata:
-        return ModuleMetadata(
-            name="cost_week",
-            description="显示本周累计成本",
-            version="1.0.0",
-            author="Claude Code",
-            enabled=True,
-        )
-
-    def initialize(self) -> None:
-        """初始化模块。"""
-        pass
-
-    def set_context(self, context: dict[str, Any]) -> None:
-        """设置上下文数据。"""
-        self._context = context
-        cost_data = context.get("cost", {})
-        self._week_cost = cost_data.get("weekly_cost", 0.0)
-
-    def refresh(self) -> None:
-        """刷新成本信息。"""
-        cost_data = self._context.get("cost", {})
-        self._week_cost = cost_data.get("weekly_cost", 0.0)
-
-    def _format_cost(self, cost: float) -> str:
-        """格式化成本金额。"""
-        return f"{self._currency}{cost:.{self._decimal_places}f}"
-
-    def get_output(self) -> ModuleOutput:
-        """获取模块输出。"""
-        if self._week_cost <= 0:
-            return ModuleOutput(
-                text="",
-                icon="",
-                color="",
-                status=ModuleStatus.DISABLED,
-            )
-
-        formatted = self._format_cost(self._week_cost)
-
-        return ModuleOutput(
-            text=formatted,
-            icon="📊",
-            color="purple",
-            status=ModuleStatus.SUCCESS,
-            tooltip=f"本周累计成本: {formatted}",
-        )
-
-    def is_available(self) -> bool:
-        """检查模块是否可用。"""
-        return self._week_cost > 0
-
-    def get_refresh_interval(self) -> float:
-        """获取刷新间隔。"""
-        return 300.0  # 5分钟刷新一次
-
-    def cleanup(self) -> None:
-        """清理资源。"""
-        pass
-
-
 class BurnRateModule(BaseModule):
     """燃烧率模块。
 
@@ -305,7 +234,8 @@ class BurnRateModule(BaseModule):
         """设置上下文数据。"""
         self._context = context
         cost_data = context.get("cost", {})
-        self._session_cost = cost_data.get("total_cost", 0.0)
+        # 优先使用 total_cost_usd（Claude Code 传递的格式）
+        self._session_cost = cost_data.get("total_cost_usd", cost_data.get("total_cost", 0.0))
         self._session_duration_ms = cost_data.get("total_duration_ms", 0)
 
     def _calculate_burn_rate(self) -> float:
@@ -327,7 +257,7 @@ class BurnRateModule(BaseModule):
     def refresh(self) -> None:
         """刷新燃烧率。"""
         cost_data = self._context.get("cost", {})
-        self._session_cost = cost_data.get("total_cost", 0.0)
+        self._session_cost = cost_data.get("total_cost_usd", cost_data.get("total_cost", 0.0))
         self._session_duration_ms = cost_data.get("total_duration_ms", 0)
 
     def _format_rate(self, rate: float) -> str:
@@ -382,7 +312,6 @@ def _register_modules() -> None:
     modules = [
         ("cost_session", CostSessionModule),
         ("cost_today", CostTodayModule),
-        ("cost_week", CostWeekModule),
         ("burn_rate", BurnRateModule),
     ]
 

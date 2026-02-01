@@ -156,6 +156,13 @@ class StatuslineEngine:
                 if ModuleRegistry.has_module(name):
                     try:
                         module = ModuleRegistry.get_instance(name)
+                        # 如果有上下文数据，先传递给模块
+                        # 这样依赖上下文的模块才能正确报告可用性
+                        if self._context and hasattr(module, "set_context"):
+                            try:
+                                module.set_context(self._context)
+                            except Exception:
+                                pass
                         if module.is_available():
                             self._modules.append(module)
                     except Exception:
@@ -173,15 +180,6 @@ class StatuslineEngine:
                 callback=self._refresh_module(module),
                 interval=interval,
             )
-
-        # 将上下文传递给所有模块
-        if self._context:
-            for module in self._modules:
-                if hasattr(module, "set_context"):
-                    try:
-                        module.set_context(self._context)
-                    except Exception:
-                        pass
 
     def _refresh_module(self, module: BaseModule) -> Callable[[], None]:
         """创建模块刷新回调。

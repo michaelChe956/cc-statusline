@@ -121,7 +121,7 @@ class GitBranchModule(BaseModule):
 
     def initialize(self) -> None:
         """初始化模块。"""
-        pass
+        self.refresh()  # 初始化时获取分支信息，确保 is_available() 能正确判断
 
     def refresh(self) -> None:
         """刷新分支信息。"""

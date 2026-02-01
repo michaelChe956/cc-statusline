@@ -46,6 +46,9 @@ class MCPStatusModule(BaseModule):
         self._cache_timeout: float = 60.0  # 1分钟缓存
         self._executor = ThreadPoolExecutor(max_workers=1)
         self._pending_update: Optional[Future] = None
+        self._config_cache: Optional[list[MCPServerInfo]] = None  # 配置缓存
+        self._config_cache_time: float = 0.0
+        self._config_cache_ttl: float = 30.0  # 配置缓存30秒
 
     @property
     def metadata(self) -> ModuleMetadata:
@@ -63,16 +66,25 @@ class MCPStatusModule(BaseModule):
 
     def refresh(self) -> None:
         """刷新 MCP 服务器状态。"""
-        self._refresh_servers()
+        # 首次刷新使用快速模式（避免 --once 模式下耗时过长）
+        fast_mode = not self._servers
+        self._refresh_servers(fast_mode=fast_mode)
 
-    def _refresh_servers(self) -> None:
-        """刷新服务器列表。"""
-        servers = self._detect_mcp_servers()
+    def _refresh_servers(self, fast_mode: bool = False) -> None:
+        """刷新服务器列表。
+
+        Args:
+            fast_mode: 是否使用快速模式（跳过耗时命令）
+        """
+        servers = self._detect_mcp_servers(fast_mode=fast_mode)
         self._servers = {s.name: s for s in servers}
         self._last_update = _get_current_time()
 
-    def _detect_mcp_servers(self) -> list[MCPServerInfo]:
+    def _detect_mcp_servers(self, fast_mode: bool = False) -> list[MCPServerInfo]:
         """检测 MCP 服务器。
+
+        Args:
+            fast_mode: 是否使用快速模式（跳过耗时命令）
 
         Returns:
             MCP 服务器列表
@@ -86,7 +98,7 @@ class MCPStatusModule(BaseModule):
                 self._all_configured.append(server.name)
 
         # 2. 尝试使用 claude mcp list 命令获取实际运行状态
-        command_servers = self._get_from_claude_command()
+        command_servers = self._get_from_claude_command(fast_mode=fast_mode)
 
         # 3. 合并结果
         command_map = {s.name: s for s in command_servers}
@@ -94,19 +106,32 @@ class MCPStatusModule(BaseModule):
         for name in self._all_configured:
             if name in command_map:
                 servers.append(command_map[name])
+            elif fast_mode:
+                # 快速模式：假设配置的服务器都在运行
+                servers.append(MCPServerInfo(name=name, status="running"))
             else:
                 # 配置中有但命令没返回，标记为 unknown
                 servers.append(MCPServerInfo(name=name, status="unknown"))
 
         return servers
 
-    def _get_from_claude_command(self) -> list[MCPServerInfo]:
+    def _get_from_claude_command(self, fast_mode: bool = False) -> list[MCPServerInfo]:
         """从 claude mcp list 命令获取服务器信息。
+
+        Args:
+            fast_mode: 是否使用快速模式（跳过耗时命令，仅从配置推断）
 
         Returns:
             MCP 服务器列表
         """
         servers: list[MCPServerInfo] = []
+
+        # 快速模式：跳过耗时的 claude mcp list 命令
+        # 适用于 --once 模式或首次加载
+        if fast_mode:
+            # 假设所有配置的服务器都在运行
+            # 这是合理的，因为 MCP 服务器通常由 Claude Code 自动管理
+            return servers
 
         try:
             # 尝试运行 claude mcp list
@@ -165,7 +190,7 @@ class MCPStatusModule(BaseModule):
         return servers
 
     def _get_from_config(self) -> list[MCPServerInfo]:
-        """从配置文件获取服务器信息。
+        """从配置文件获取服务器信息（带缓存）。
 
         配置文件结构 (~/.claude.json):
         {
@@ -180,12 +205,19 @@ class MCPStatusModule(BaseModule):
         Returns:
             MCP 服务器列表
         """
+        # 检查配置缓存是否有效
+        now = _get_current_time()
+        if self._config_cache is not None and (now - self._config_cache_time) <= self._config_cache_ttl:
+            return self._config_cache
+
         servers: list[MCPServerInfo] = []
 
         # 配置文件路径
         config_path = Path.home() / ".claude.json"
 
         if not config_path.exists():
+            self._config_cache = servers
+            self._config_cache_time = now
             return servers
 
         try:
@@ -239,6 +271,9 @@ class MCPStatusModule(BaseModule):
         except (json.JSONDecodeError, OSError):
             pass
 
+        # 更新缓存
+        self._config_cache = servers
+        self._config_cache_time = now
         return servers
 
     def _parse_mcp_config_for_test(self, config_path: Path) -> list[MCPServerInfo]:
@@ -410,6 +445,9 @@ class MCPStatusModule(BaseModule):
     def cleanup(self) -> None:
         """清理资源。"""
         self._servers.clear()
+        self._all_configured.clear()
+        self._config_cache = None
+        self._config_cache_time = 0.0
         if self._executor:
             self._executor.shutdown(wait=False)
 

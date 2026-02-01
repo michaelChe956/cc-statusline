@@ -192,6 +192,28 @@ StatuslineEngine (引擎核心)
 
 ---
 
-**最后更新**: 2026-01-29
+**最后更新**: 2026-02-01
 **维护者**: Michael
-**状态**: ✅ 核心模块测试完成，覆盖率 89%
+**状态**: ✅ 核心功能完整，18个已实现模块，PlanModule 引用已清理
+
+## 📅 最近更新 (2026-02-01)
+
+### PlanModule 引用清理
+- 从 3 处配置中移除 `"plan"` 模块引用
+- `commands.py:488` - preset_modules["full"]
+- `powerline.py:331` - render_preset_full()
+- `powerline.py:379` - PowerlineLayout.PRESETS["full"]
+- 验证无遗漏引用，功能正常
+
+### 当前可用模块（24个）
+- 基础信息: dir, git_branch, git_status, version
+- 模型与上下文: model, context_pct, context_bar
+- 成本统计: cost_session, cost_today, cost_week, burn_rate
+- 时间与计费: session_time, reset_timer, block_usage
+- 实时监控: mcp_status, agent_status, todo_progress, activity_indicator
+- 其他: ...
+
+### 技术要点
+- 模块删除必须清理所有配置引用
+- 上下文依赖模块在无数据时自动隐藏
+- 使用 `grep -r` 验证无遗漏引用

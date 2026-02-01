@@ -328,15 +328,15 @@ class PowerlineRenderer:
             渲染后的字符串
         """
         # 行1: 基础信息
-        line1_modules = ["dir", "git_branch", "model", "plan", "version"]
+        line1_modules = ["dir", "git_branch", "model", "version"]
         line1 = [outputs[m] for m in line1_modules if m in outputs]
 
         # 行2: 上下文和时间
-        line2_modules = ["context_bar", "session_time", "reset_timer", "block_usage"]
+        line2_modules = ["context_bar", "session_time", "reset_timer"]
         line2 = [outputs[m] for m in line2_modules if m in outputs]
 
         # 行3: 成本统计
-        line3_modules = ["cost_session", "cost_today", "cost_week", "burn_rate"]
+        line3_modules = ["cost_session", "cost_today", "burn_rate"]
         line3 = [outputs[m] for m in line3_modules if m in outputs]
 
         # 行4: 实时监控
@@ -376,9 +376,9 @@ class PowerlineLayout:
         },
         "full": {
             "lines": [
-                ["dir", "git_branch", "model", "plan", "version"],
-                ["context_bar", "session_time", "reset_timer", "block_usage"],
-                ["cost_session", "cost_today", "cost_week", "burn_rate"],
+                ["dir", "git_branch", "model", "version"],
+                ["context_bar", "session_time", "reset_timer"],
+                ["cost_session", "cost_today", "burn_rate"],
                 ["mcp_status", "agent_status", "todo_progress"],
             ],
             "color_cycles": [
