@@ -8,7 +8,7 @@ from typing import Any, Optional
 
 import yaml
 
-from cc_statusline.theme.builtins import BUILTIN_THEMES
+from cc_status.theme.builtins import BUILTIN_THEMES
 
 
 class ThemeLoader:

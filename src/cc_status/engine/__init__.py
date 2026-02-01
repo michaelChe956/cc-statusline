@@ -3,8 +3,8 @@
 导出引擎相关类型。
 """
 
-from cc_statusline.engine.scheduler import Scheduler, SchedulerState
-from cc_statusline.engine.statusline_engine import (
+from cc_status.engine.scheduler import Scheduler, SchedulerState
+from cc_status.engine.statusline_engine import (
     DisplayMode,
     EngineConfig,
     StatuslineEngine,

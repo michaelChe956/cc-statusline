@@ -2,11 +2,9 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-from cc_statusline.engine import EngineConfig, StatuslineEngine
-from cc_statusline.modules.base import ModuleOutput, ModuleStatus
-from cc_statusline.render.terminal_renderer import TerminalRenderer, _is_tty
+from cc_status.engine import EngineConfig, StatuslineEngine
+from cc_status.modules.base import ModuleOutput, ModuleStatus
+from cc_status.render.terminal_renderer import TerminalRenderer, _is_tty
 
 
 class TestIsTTY:
@@ -261,10 +259,10 @@ class TestTerminalRenderer:
 class TestCreateStatusline:
     """创建状态栏函数测试类"""
 
-    @patch("cc_statusline.render.terminal_renderer.TerminalRenderer")
+    @patch("cc_status.render.terminal_renderer.TerminalRenderer")
     def test_create_statusline(self, mock_renderer_class: MagicMock) -> None:
         """测试创建状态栏"""
-        from cc_statusline.render.terminal_renderer import create_statusline
+        from cc_status.render.terminal_renderer import create_statusline
 
         mock_renderer = MagicMock()
         mock_renderer_class.return_value = mock_renderer

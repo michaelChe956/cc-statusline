@@ -250,7 +250,7 @@ class ClaudeConfigInstaller:
 
                 # 6. 版本信息
                 if report["command_executable"]:
-                    from cc_statusline import __version__
+                    from cc_status import __version__
 
                     report["version"] = __version__
 
@@ -298,7 +298,7 @@ class ClaudeConfigInstaller:
         优先级:
         1. uvx cc-statusline (推荐)
         2. 全局安装的 cc-statusline
-        3. 本地虚拟环境中的 python -m cc_statusline
+        3. 本地虚拟环境中的 python -m cc_status
 
         Returns:
             可用的命令字符串，如果未找到则返回 None
@@ -339,12 +339,12 @@ class ClaudeConfigInstaller:
         # 3. 尝试 python -m
         try:
             result = subprocess.run(
-                ["python", "-m", "cc_statusline", "--version"],
+                ["python", "-m", "cc_status", "--version"],
                 capture_output=True,
                 timeout=2,
             )
             if result.returncode == 0:
-                return "python -m cc_statusline"
+                return "python -m cc_status"
         except (FileNotFoundError, subprocess.TimeoutExpired):
             pass
 
@@ -427,7 +427,7 @@ class ClaudeConfigInstaller:
         export_data: dict[str, Any] = {}
 
         if include_metadata:
-            from cc_statusline import __version__
+            from cc_status import __version__
 
             export_data = {
                 "version": __version__,
@@ -519,7 +519,7 @@ class ClaudeConfigInstaller:
         Returns:
             配置版本字符串，如果未配置则返回 None
         """
-        from cc_statusline import __version__
+        from cc_status import __version__
 
         if not cls.CONFIG_PATH.exists():
             return None

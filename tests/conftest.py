@@ -1,11 +1,11 @@
 """pytest 配置和共享 fixtures"""
 
+from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
-from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 
 # ============ 原有 fixtures ============
@@ -19,8 +19,8 @@ def sample_config() -> dict[str, Any]:
 @pytest.fixture(autouse=True)
 def reset_singletons():
     """自动重置所有单例（每个测试前）"""
-    from cc_statusline.modules.registry import ModuleRegistry
-    from cc_statusline.engine.statusline_engine import reset_engine
+    from cc_status.engine.statusline_engine import reset_engine
+    from cc_status.modules.registry import ModuleRegistry
 
     ModuleRegistry.reset()
     reset_engine()
@@ -95,17 +95,15 @@ def invalid_yaml_file(tmp_path: Path) -> Path:
 @pytest.fixture
 def valid_module_output():
     """创建有效的 ModuleOutput"""
-    from cc_statusline.modules.base import ModuleOutput, ModuleStatus
+    from cc_status.modules.base import ModuleOutput, ModuleStatus
 
-    return ModuleOutput(
-        text="Test Output", icon="T", color="green", status=ModuleStatus.SUCCESS
-    )
+    return ModuleOutput(text="Test Output", icon="T", color="green", status=ModuleStatus.SUCCESS)
 
 
 @pytest.fixture
 def mock_base_module():
     """创建通用的模拟模块"""
-    from cc_statusline.modules.base import (
+    from cc_status.modules.base import (
         ModuleMetadata,
         ModuleOutput,
         ModuleStatus,
@@ -127,11 +125,9 @@ def mock_base_module():
 @pytest.fixture
 def sample_module_class():
     """创建示例模块类用于注册表测试"""
-    from cc_statusline.modules.base import (
-        BaseModule,
+    from cc_status.modules.base import (
         ModuleMetadata,
         ModuleOutput,
-        ModuleStatus,
     )
 
     class SampleModule:
@@ -162,7 +158,7 @@ def sample_module_class():
 @pytest.fixture
 def engine_config():
     """创建引擎配置"""
-    from cc_statusline.engine.statusline_engine import EngineConfig
+    from cc_status.engine.statusline_engine import EngineConfig
 
     return EngineConfig(theme="modern", refresh_interval=1.0)
 
@@ -170,7 +166,7 @@ def engine_config():
 @pytest.fixture
 def engine(engine_config):
     """创建引擎实例"""
-    from cc_statusline.engine.statusline_engine import StatuslineEngine
+    from cc_status.engine.statusline_engine import StatuslineEngine
 
     eng = StatuslineEngine(engine_config)
     yield eng
@@ -181,7 +177,7 @@ def engine(engine_config):
 @pytest.fixture
 def theme_loader():
     """创建主题加载器实例"""
-    from cc_statusline.theme.loader import ThemeLoader
+    from cc_status.theme.loader import ThemeLoader
 
     return ThemeLoader()
 
@@ -189,7 +185,7 @@ def theme_loader():
 @pytest.fixture
 def scheduler():
     """创建调度器实例"""
-    from cc_statusline.engine.scheduler import Scheduler
+    from cc_status.engine.scheduler import Scheduler
 
     sch = Scheduler()
     yield sch

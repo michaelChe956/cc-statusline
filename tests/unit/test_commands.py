@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from cc_statusline.cli import commands
+from cc_status.cli import commands
 
 
 class TestCreateParser:
@@ -130,8 +130,8 @@ class TestCreateParser:
 class TestCmdListThemes:
     """列出主题命令测试类"""
 
-    @patch("cc_statusline.theme.theme_loader")
-    @patch("cc_statusline.theme.get_theme_names")
+    @patch("cc_status.theme.theme_loader")
+    @patch("cc_status.theme.get_theme_names")
     def test_cmd_list_themes(self, mock_get_names: MagicMock, mock_loader: MagicMock) -> None:
         """测试列出所有主题"""
         mock_get_names.return_value = ["modern", "minimal"]
@@ -148,7 +148,7 @@ class TestCmdListThemes:
 class TestCmdListModules:
     """列出模块命令测试类"""
 
-    @patch("cc_statusline.modules.registry.ModuleRegistry")
+    @patch("cc_status.modules.registry.ModuleRegistry")
     def test_cmd_list_modules(self, mock_registry: MagicMock) -> None:
         """测试列出所有模块"""
         mock_registry.list_modules.return_value = [
@@ -167,7 +167,7 @@ class TestCmdListModules:
 class TestCmdInstall:
     """安装命令测试类"""
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_install_basic(self, mock_installer_class: MagicMock) -> None:
         """测试基本安装命令"""
         mock_installer_class.install.return_value = True
@@ -183,7 +183,7 @@ class TestCmdInstall:
         assert result == 0
         mock_installer_class.install.assert_called_once()
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_install_failure(self, mock_installer_class: MagicMock) -> None:
         """测试安装失败"""
         mock_installer_class.install.return_value = False
@@ -202,7 +202,7 @@ class TestCmdInstall:
 class TestCmdUninstall:
     """卸载命令测试类"""
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_uninstall_basic(self, mock_installer_class: MagicMock) -> None:
         """测试基本卸载命令"""
         mock_installer_class.uninstall.return_value = True
@@ -213,7 +213,7 @@ class TestCmdUninstall:
         assert result == 0
         mock_installer_class.uninstall.assert_called_once()
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_uninstall_failure(self, mock_installer_class: MagicMock) -> None:
         """测试卸载失败"""
         mock_installer_class.uninstall.return_value = False
@@ -227,7 +227,7 @@ class TestCmdUninstall:
 class TestCmdVerify:
     """验证命令测试类"""
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_verify_basic(self, mock_installer_class: MagicMock) -> None:
         """测试基本验证命令"""
         mock_installer_class.verify.return_value = True
@@ -237,7 +237,7 @@ class TestCmdVerify:
         result = commands.cmd_verify(args)
         assert result == 0
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_verify_verbose(self, mock_installer_class: MagicMock) -> None:
         """测试详细验证"""
         mock_installer_class.verify.return_value = True
@@ -248,7 +248,7 @@ class TestCmdVerify:
         assert result == 0
         mock_installer_class.verify.assert_called_with(verbose=True, test_command=False)
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_verify_with_test(self, mock_installer_class: MagicMock) -> None:
         """测试验证（带命令测试）"""
         mock_installer_class.verify.return_value = True
@@ -259,7 +259,7 @@ class TestCmdVerify:
         assert result == 0
         mock_installer_class.verify.assert_called_with(verbose=False, test_command=True)
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_verify_health_check(self, mock_installer_class: MagicMock) -> None:
         """测试健康检查"""
         mock_installer_class.health_check.return_value = {
@@ -278,7 +278,7 @@ class TestCmdVerify:
         assert result == 0
         mock_installer_class.health_check.assert_called_once()
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_verify_failure(self, mock_installer_class: MagicMock) -> None:
         """测试验证失败"""
         mock_installer_class.verify.return_value = False
@@ -292,7 +292,7 @@ class TestCmdVerify:
 class TestCmdExport:
     """导出命令测试类"""
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_export_basic(self, mock_installer_class: MagicMock) -> None:
         """测试基本导出命令"""
         mock_installer_class.export_config.return_value = True
@@ -303,7 +303,7 @@ class TestCmdExport:
         assert result == 0
         mock_installer_class.export_config.assert_called_once()
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_export_no_metadata(self, mock_installer_class: MagicMock) -> None:
         """测试导出（不带元数据）"""
         mock_installer_class.export_config.return_value = True
@@ -313,7 +313,7 @@ class TestCmdExport:
         result = commands.cmd_export(args)
         assert result == 0
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_export_failure(self, mock_installer_class: MagicMock) -> None:
         """测试导出失败"""
         mock_installer_class.export_config.return_value = False
@@ -327,7 +327,7 @@ class TestCmdExport:
 class TestCmdImport:
     """导入命令测试类"""
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_import_basic(self, mock_installer_class: MagicMock) -> None:
         """测试基本导入命令"""
         mock_installer_class.import_config.return_value = True
@@ -338,7 +338,7 @@ class TestCmdImport:
         assert result == 0
         mock_installer_class.import_config.assert_called_once()
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_import_force(self, mock_installer_class: MagicMock) -> None:
         """测试强制导入"""
         mock_installer_class.import_config.return_value = True
@@ -348,7 +348,7 @@ class TestCmdImport:
         result = commands.cmd_import(args)
         assert result == 0
 
-    @patch("cc_statusline.config.ClaudeConfigInstaller")
+    @patch("cc_status.config.ClaudeConfigInstaller")
     def test_cmd_import_failure(self, mock_installer_class: MagicMock) -> None:
         """测试导入失败"""
         mock_installer_class.import_config.return_value = False
@@ -362,14 +362,14 @@ class TestCmdImport:
 class TestMain:
     """主函数测试类"""
 
-    @patch("cc_statusline.cli.commands.cmd_list_themes")
+    @patch("cc_status.cli.commands.cmd_list_themes")
     def test_main_list_themes(self, mock_cmd: MagicMock) -> None:
         """测试主函数（列出主题）"""
         result = commands.main(["--list-themes"])
         assert result == 0
         mock_cmd.assert_called_once()
 
-    @patch("cc_statusline.cli.commands.create_parser")
+    @patch("cc_status.cli.commands.create_parser")
     def test_main_no_args(self, mock_parser: MagicMock) -> None:
         """测试主函数（无参数）"""
         args = MagicMock()

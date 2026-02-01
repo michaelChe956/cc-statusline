@@ -1,9 +1,8 @@
 """任务调度器单元测试"""
 
-import pytest
 from unittest.mock import MagicMock, patch
 
-from cc_statusline.engine.scheduler import Scheduler, SchedulerState, Task
+from cc_status.engine.scheduler import SchedulerState, Task
 
 
 class TestSchedulerState:

@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from cc_statusline.config.installer import ClaudeConfigInstaller
+from cc_status.config.installer import ClaudeConfigInstaller
 
 
 class TestClaudeConfigInstaller:
@@ -91,11 +91,11 @@ class TestClaudeConfigInstaller:
         mock_run.side_effect = [
             MagicMock(returncode=1),  # uvx --version 失败
             MagicMock(returncode=1),  # cc-statusline --version 失败
-            MagicMock(returncode=0),  # python -m cc_statusline --version
+            MagicMock(returncode=0),  # python -m cc_status --version
         ]
 
         command = ClaudeConfigInstaller.detect_command()
-        assert command == "python -m cc_statusline"
+        assert command == "python -m cc_status"
 
     @patch("subprocess.run")
     def test_detect_command_none(self, mock_run):

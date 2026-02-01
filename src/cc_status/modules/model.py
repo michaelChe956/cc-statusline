@@ -3,15 +3,15 @@
 提供模型信息、订阅计划和上下文使用率显示。
 """
 
-from typing import Any, Optional
+from typing import Any
 
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     BaseModule,
     ModuleMetadata,
     ModuleOutput,
     ModuleStatus,
 )
-from cc_statusline.modules.registry import ModuleRegistry
+from cc_status.modules.registry import ModuleRegistry
 
 
 class ModelModule(BaseModule):

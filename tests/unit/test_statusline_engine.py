@@ -1,14 +1,13 @@
 """状态栏引擎单元测试"""
 
-import pytest
 from unittest.mock import MagicMock, patch
 
-from cc_statusline.engine.statusline_engine import (
+from cc_status.engine.statusline_engine import (
     DisplayMode,
     EngineConfig,
     StatuslineEngine,
 )
-from cc_statusline.modules.base import ModuleOutput, ModuleStatus
+from cc_status.modules.base import ModuleOutput
 
 
 class TestEngineConfig:
@@ -25,9 +24,7 @@ class TestEngineConfig:
 
     def test_init_with_params(self) -> None:
         """测试带参数初始化"""
-        config = EngineConfig(
-            theme="minimal", refresh_interval=2.0, modules=["test"]
-        )
+        config = EngineConfig(theme="minimal", refresh_interval=2.0, modules=["test"])
         assert config.theme == "minimal"
         assert config.refresh_interval == 2.0
         assert "test" in config.modules
@@ -169,7 +166,10 @@ class TestStatuslineEngineModuleRegistration:
         engine._config.modules = ["test"]
 
         # Mock ModuleRegistry.get_instance to return our mock
-        with patch("cc_statusline.modules.registry.ModuleRegistry.get_instance", return_value=mock_base_module):
+        with patch(
+            "cc_status.modules.registry.ModuleRegistry.get_instance",
+            return_value=mock_base_module,
+        ):
             engine.initialize()
             # initialize 方法应该被调用（通过 is_available 检查）
             mock_base_module.is_available.assert_called()
@@ -182,7 +182,10 @@ class TestStatuslineEngineModuleRegistration:
         engine.register_module("test", sample_module_class)
         engine._config.modules = ["test"]
 
-        with patch("cc_statusline.modules.registry.ModuleRegistry.get_instance", return_value=mock_base_module):
+        with patch(
+            "cc_status.modules.registry.ModuleRegistry.get_instance",
+            return_value=mock_base_module,
+        ):
             engine.initialize()
             # 不可用的模块不应该被添加到 _modules
             assert mock_base_module not in engine._modules
@@ -232,7 +235,10 @@ class TestStatuslineEngineRefresh:
     def test_refresh_module_updates_output(self, engine, mock_base_module) -> None:
         """测试刷新模块更新输出"""
         with patch.object(engine, "_modules", [mock_base_module]):
-            with patch("cc_statusline.modules.registry.ModuleRegistry.get_enabled_modules", return_value=[mock_base_module]):
+            with patch(
+                "cc_status.modules.registry.ModuleRegistry.get_enabled_modules",
+                return_value=[mock_base_module],
+            ):
                 engine.initialize()
                 # initialize 会为模块创建调度任务
                 # 验证模块被处理
@@ -242,10 +248,8 @@ class TestStatuslineEngineRefresh:
 class TestStatuslineEngineLifecycle:
     """生命周期测试（使用 mock）"""
 
-    @patch("cc_statusline.engine.statusline_engine.Scheduler")
-    def test_start_changes_state_to_running(
-        self, mock_scheduler_class, engine_config
-    ) -> None:
+    @patch("cc_status.engine.statusline_engine.Scheduler")
+    def test_start_changes_state_to_running(self, mock_scheduler_class, engine_config) -> None:
         """测试启动改变状态为运行"""
         mock_scheduler = MagicMock()
         mock_scheduler_class.return_value = mock_scheduler
@@ -253,10 +257,8 @@ class TestStatuslineEngineLifecycle:
         engine.start()
         assert engine.state == "running"
 
-    @patch("cc_statusline.engine.statusline_engine.Scheduler")
-    def test_start_starts_scheduler(
-        self, mock_scheduler_class, engine_config
-    ) -> None:
+    @patch("cc_status.engine.statusline_engine.Scheduler")
+    def test_start_starts_scheduler(self, mock_scheduler_class, engine_config) -> None:
         """测试启动启动调度器"""
         mock_scheduler = MagicMock()
         mock_scheduler_class.return_value = mock_scheduler

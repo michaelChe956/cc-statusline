@@ -5,13 +5,13 @@
 
 from typing import Any
 
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     BaseModule,
     ModuleMetadata,
     ModuleOutput,
     ModuleStatus,
 )
-from cc_statusline.modules.registry import ModuleRegistry
+from cc_status.modules.registry import ModuleRegistry
 
 
 class AgentStatusModule(BaseModule):

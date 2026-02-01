@@ -4,11 +4,10 @@
 """
 
 import argparse
-import json
 import sys
 from typing import Optional
 
-from cc_statusline import __version__
+from cc_status import __version__
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -232,7 +231,7 @@ def create_parser() -> argparse.ArgumentParser:
 
 def cmd_list_themes() -> None:
     """列出所有主题。"""
-    from cc_statusline.theme import get_theme_names, theme_loader
+    from cc_status.theme import get_theme_names, theme_loader
 
     themes = get_theme_names()
     available = theme_loader.list_available()
@@ -260,12 +259,12 @@ def cmd_install(args: argparse.Namespace) -> int:
     Returns:
         退出码
     """
-    from cc_statusline.config import ClaudeConfigInstaller
+    from cc_status.config import ClaudeConfigInstaller
 
     try:
         # 交互式安装模式
         if args.interactive:
-            from cc_statusline.config import InteractiveInstaller
+            from cc_status.config import InteractiveInstaller
 
             success = InteractiveInstaller.run()
             return 0 if success else 1
@@ -291,7 +290,7 @@ def cmd_uninstall(args: argparse.Namespace) -> int:
     Returns:
         退出码
     """
-    from cc_statusline.config import ClaudeConfigInstaller
+    from cc_status.config import ClaudeConfigInstaller
 
     try:
         success = ClaudeConfigInstaller.uninstall()
@@ -310,7 +309,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
     Returns:
         退出码
     """
-    from cc_statusline.config import ClaudeConfigInstaller
+    from cc_status.config import ClaudeConfigInstaller
 
     try:
         # 健康检查模式
@@ -398,7 +397,7 @@ def cmd_export(args: argparse.Namespace) -> int:
     """
     from pathlib import Path
 
-    from cc_statusline.config import ClaudeConfigInstaller
+    from cc_status.config import ClaudeConfigInstaller
 
     try:
         success = ClaudeConfigInstaller.export_config(
@@ -422,7 +421,7 @@ def cmd_import(args: argparse.Namespace) -> int:
     """
     from pathlib import Path
 
-    from cc_statusline.config import ClaudeConfigInstaller
+    from cc_status.config import ClaudeConfigInstaller
 
     try:
         success = ClaudeConfigInstaller.import_config(
@@ -438,14 +437,14 @@ def cmd_import(args: argparse.Namespace) -> int:
 def cmd_list_modules() -> None:
     """列出所有模块。"""
     # 导入模块以注册它们
-    import cc_statusline.modules.basic  # noqa: F401
-    import cc_statusline.modules.cost  # noqa: F401
-    import cc_statusline.modules.mcp_status  # noqa: F401
-    import cc_statusline.modules.model  # noqa: F401
-    import cc_statusline.modules.realtime  # noqa: F401
-    import cc_statusline.modules.session_time  # noqa: F401
-    import cc_statusline.modules.time_modules  # noqa: F401
-    from cc_statusline.modules.registry import ModuleRegistry
+    import cc_status.modules.basic  # noqa: F401
+    import cc_status.modules.cost  # noqa: F401
+    import cc_status.modules.mcp_status  # noqa: F401
+    import cc_status.modules.model  # noqa: F401
+    import cc_status.modules.realtime  # noqa: F401
+    import cc_status.modules.session_time  # noqa: F401
+    import cc_status.modules.time_modules  # noqa: F401
+    from cc_status.modules.registry import ModuleRegistry
 
     registered = ModuleRegistry.list_modules()
     enabled = ModuleRegistry.list_modules(enabled_only=True)
@@ -469,23 +468,48 @@ def cmd_list_modules() -> None:
 def cmd_status(args: argparse.Namespace) -> None:
     """执行 status 命令。"""
     # 导入模块以注册它们
-    import cc_statusline.modules.basic  # noqa: F401
-    import cc_statusline.modules.cost  # noqa: F401
-    import cc_statusline.modules.mcp_status  # noqa: F401
-    import cc_statusline.modules.model  # noqa: F401
-    import cc_statusline.modules.realtime  # noqa: F401
-    import cc_statusline.modules.session_time  # noqa: F401
-    import cc_statusline.modules.time_modules  # noqa: F401
-    from cc_statusline.engine.statusline_engine import EngineConfig, StatuslineEngine
-    from cc_statusline.render.powerline import PowerlineLayout, PowerlineRenderer
-    from cc_statusline.render.terminal_renderer import TerminalRenderer
-    from cc_statusline.theme import theme_loader
+    import cc_status.modules.basic  # noqa: F401
+    import cc_status.modules.cost  # noqa: F401
+    import cc_status.modules.mcp_status  # noqa: F401
+    import cc_status.modules.model  # noqa: F401
+    import cc_status.modules.realtime  # noqa: F401
+    import cc_status.modules.session_time  # noqa: F401
+    import cc_status.modules.time_modules  # noqa: F401
+    from cc_status.engine.statusline_engine import EngineConfig, StatuslineEngine
+    from cc_status.render.powerline import PowerlineLayout, PowerlineRenderer
+    from cc_status.render.terminal_renderer import TerminalRenderer
+    from cc_status.theme import theme_loader
 
     # 根据预设确定默认模块
     preset_modules = {
         "minimal": ["dir", "git_branch", "model", "cost_session", "context_pct"],
-        "standard": ["dir", "git_branch", "model", "version", "context_bar", "session_time", "reset_timer", "cost_session", "cost_today", "burn_rate"],
-        "full": ["dir", "git_branch", "model", "version", "context_bar", "session_time", "reset_timer", "cost_session", "cost_today", "burn_rate", "mcp_status", "agent_status", "todo_progress"],
+        "standard": [
+            "dir",
+            "git_branch",
+            "model",
+            "version",
+            "context_bar",
+            "session_time",
+            "reset_timer",
+            "cost_session",
+            "cost_today",
+            "burn_rate",
+        ],
+        "full": [
+            "dir",
+            "git_branch",
+            "model",
+            "version",
+            "context_bar",
+            "session_time",
+            "reset_timer",
+            "cost_session",
+            "cost_today",
+            "burn_rate",
+            "mcp_status",
+            "agent_status",
+            "todo_progress",
+        ],
     }
 
     # 创建引擎配置
@@ -589,9 +613,9 @@ def cmd_status(args: argparse.Namespace) -> None:
         print("模块状态:")
         module_info = engine.get_module_info()
         for name in modules:
-            info = next((m for m in module_info if m['name'] == name), None)
+            info = next((m for m in module_info if m["name"] == name), None)
             if info:
-                status = "✅ 可用" if info['available'] else "❌ 不可用"
+                status = "✅ 可用" if info["available"] else "❌ 不可用"
                 print(f"  {name:20} {status}")
             else:
                 print(f"  {name:20} ⚠️ 未加载")
@@ -652,9 +676,9 @@ def cmd_status(args: argparse.Namespace) -> None:
 
 def cmd_run(args: argparse.Namespace) -> None:
     """运行_run(args: argparse状态栏。"""
-    from cc_statusline.engine.statusline_engine import EngineConfig, StatuslineEngine
-    from cc_statusline.render.terminal_renderer import TerminalRenderer
-    from cc_statusline.theme import theme_loader
+    from cc_status.engine.statusline_engine import EngineConfig, StatuslineEngine
+    from cc_status.render.terminal_renderer import TerminalRenderer
+    from cc_status.theme import theme_loader
 
     # 创建引擎配置
     config = EngineConfig(

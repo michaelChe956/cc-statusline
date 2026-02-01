@@ -7,7 +7,7 @@
 from datetime import timedelta
 from typing import Any, Optional
 
-from cc_statusline.modules.base import (
+from cc_status.modules.base import (
     BaseModule,
     ModuleMetadata,
     ModuleOutput,
@@ -162,7 +162,7 @@ class SessionTimeModule(BaseModule):
 # 自动注册（仅在直接运行时执行，测试时会通过 conftest.py 处理）
 def _register_module() -> None:
     """注册模块到注册表。"""
-    from cc_statusline.modules.registry import ModuleRegistry
+    from cc_status.modules.registry import ModuleRegistry
 
     # 检查是否已注册，避免重复注册
     if not ModuleRegistry.has_module("session_time"):

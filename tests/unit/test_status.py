@@ -8,8 +8,8 @@ def test_placeholder() -> None:
 
 def test_import() -> None:
     """测试包导入和版本号"""
-    import cc_statusline
+    import cc_status
 
-    assert cc_statusline.__version__ == "0.0.1"
-    assert cc_statusline.__author__ == "Michael Che"
-    assert cc_statusline.__license__ == "Apache-2.0"
+    assert cc_status.__version__ == "0.0.1"
+    assert cc_status.__author__ == "Michael Che"
+    assert cc_status.__license__ == "Apache-2.0"
